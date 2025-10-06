@@ -134,8 +134,4 @@ src/
 
 ## 📜 Licence
 
-Usage éducatif dans le cadre du projet P13.
-
-```
-
-```
+Usage éducatif dans le cadre du projet P13 OpenClassroom.
