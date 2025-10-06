@@ -1,4 +1,4 @@
-# Projet 13 – Utilisez une API pour un compte utilisateur bancaire (Argent Bank) — **Starter Kit 100% JavaScript**
+# Argent Bank – Utilisez une API pour un compte utilisateur bancaire
 
 ````markdown
 # Argent Bank – Frontend (P13, JavaScript)
