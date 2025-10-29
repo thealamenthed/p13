@@ -1,72 +1,79 @@
 // src/pages/Login.jsx
 import {useState} from "react";
+import {useDispatch} from "react-redux";
+import {useNavigate, Link} from "react-router-dom";
+import {login as loginThunk} from "../features/auth/authSlice";
 import {useLoginMutation} from "../features/user/userApi";
-import {useAppDispatch} from "../app/hooks";
-import {loggedIn} from "../features/auth/authSlice";
-import {useNavigate} from "react-router-dom";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(false); // pour coller à la maquette
-  const [login, {isLoading, error}] = useLoginMutation();
-  const dispatch = useAppDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    remember: false
+  });
+
+  const [login, {isLoading, error}] = useLoginMutation();
+
+  const onChange = (e) => {
+    const {name, value, type, checked} = e.target;
+    setForm((f) => ({...f, [name]: type === "checkbox" ? checked : value}));
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await login({email, password}).unwrap();
-      dispatch(loggedIn(res.token));
-      // (optionnel) persist "remember" dans localStorage si tu veux
+      const res = await login({email: form.email, password: form.password}).unwrap();
+      // Le back Phase 1 peut renvoyer { token } ou { status, message, body: { token } }
+      const token = res?.body?.token || res?.token;
+      if (!token) throw new Error("Token manquant dans la réponse");
+      dispatch(loginThunk(token)); //thunk qui persiste + met à jour Redux
       navigate("/profile");
-    } catch {
-      // l'erreur s'affiche via <p role="alert" />
+    } catch (err) {
+      console.error(err);
     }
   };
+
+  const serverError = error?.data?.message || error?.error;
 
   return (
     <main className="main bg-dark">
       <section className="sign-in-content">
-        {/* Icône de la maquette (Font Awesome) */}
         <i className="fa fa-user-circle sign-in-icon" aria-hidden="true"></i>
-
         <h1>Sign In</h1>
 
-        <form onSubmit={onSubmit} aria-busy={isLoading} aria-live="polite">
+        <form onSubmit={onSubmit} noValidate>
           <div className="input-wrapper">
-            <label htmlFor="username">Username</label>
-            <input id="username" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" autoFocus required />
+            <label htmlFor="email">Username</label>
+            <input id="email" name="email" type="email" autoComplete="username" value={form.email} onChange={onChange} required />
           </div>
 
           <div className="input-wrapper">
             <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-            />
+            <input id="password" name="password" type="password" autoComplete="current-password" value={form.password} onChange={onChange} required />
           </div>
 
           <div className="input-remember">
-            <input id="remember-me" type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+            <input id="remember-me" name="remember" type="checkbox" checked={form.remember} onChange={onChange} />
             <label htmlFor="remember-me">Remember me</label>
           </div>
 
-          {/* Remplace le <a> statique par un vrai button submit */}
-          <button className="sign-in-button" disabled={isLoading || !email || !password}>
-            {isLoading ? "Signing in…" : "Sign In"}
-          </button>
-
-          {error && (
-            <p className="form-error" role="alert">
-              Unable to sign in. Check your credentials.
+          {serverError && (
+            <p className="form-error" role="alert" style={{marginTop: 8}}>
+              {serverError || "Unable to sign in. Check your credentials."}
             </p>
           )}
+
+          <button className="sign-in-button" type="submit" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Sign In"}
+          </button>
         </form>
+
+        <p style={{marginTop: 12}}>
+          <Link to="/">Back to home</Link>
+        </p>
       </section>
     </main>
   );

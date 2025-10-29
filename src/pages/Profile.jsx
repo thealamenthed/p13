@@ -6,6 +6,8 @@ export default function Profile() {
   const {data: profile, isLoading, isError} = useGetProfileQuery();
   const [updateProfile, {isLoading: saving}] = useUpdateProfileMutation();
 
+  console.log(profile);
+
   // Édition du nom (toggle)
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -25,8 +27,8 @@ export default function Profile() {
     );
 
   const startEdit = () => {
-    setFirstName(profile.firstName || "");
-    setLastName(profile.lastName || "");
+    setFirstName(profile?.body?.firstName || "");
+    setLastName(profile?.body?.lastName || "");
     setIsEditing(true);
   };
 
@@ -55,7 +57,7 @@ export default function Profile() {
               className="profile-input"
               type="text"
               placeholder="First name"
-              value={firstName || profile.firstName || ""}
+              value={firstName || profile?.body?.firstName || ""}
               onChange={(e) => setFirstName(e.target.value)}
               required
             />
@@ -64,7 +66,7 @@ export default function Profile() {
               className="profile-input"
               type="text"
               placeholder="Last name"
-              value={lastName || profile.lastName || ""}
+              value={lastName || profile?.body?.lastName || ""}
               onChange={(e) => setLastName(e.target.value)}
               required
             />
@@ -80,7 +82,7 @@ export default function Profile() {
         }
       </div>
 
-      {/* Conserve les sections "Accounts" de la maquette (statiques en Phase 1) */}
+      {/* sections "Accounts" de la maquette (statiques en Phase 1) */}
       <h2 className="sr-only">Accounts</h2>
 
       <section className="account card">
@@ -90,7 +92,9 @@ export default function Profile() {
           <p className="account-amount-description">Available Balance</p>
         </div>
         <div className="account-content-wrapper cta">
-          <button className="transaction-button transaction-button--primary">View transactions</button>
+          <button className="transaction-button transaction-button--primary">
+            <a href="/transactions">View transactions</a>
+          </button>
         </div>
       </section>
 

@@ -398,6 +398,19 @@ body {
   cursor: pointer;
 }
 
+/* Lien interne du bouton transactions */
+.transaction-button a {
+  color: #fff;
+  text-decoration: none;
+  display: block;
+}
+
+.transaction-button a:hover,
+.transaction-button a:focus {
+  color: #fff;
+  text-decoration: none;
+}
+
 @media (min-width: 720px) {
   .account {
     flex-direction: row;

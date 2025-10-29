@@ -1,24 +1,30 @@
+// src/services/baseApi.js
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
-import {getToken, clearToken} from "./token";
+import {logout} from "../features/auth/authSlice";
 
+// BaseQuery avec injection automatique du JWT depuis Redux sur toutes les requêtes
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_URL,
-  prepareHeaders: (headers) => {
-    const token = getToken();
-    if (token) headers.set("Authorization", `Bearer ${token}`);
+  baseUrl: "http://localhost:3001/api/v1",
+  prepareHeaders: (headers, {getState}) => {
+    const token = getState().auth?.token;
+    if (token) headers.set("Authorization", `Bearer ${token}`); // injection du JWT dans les headers
     return headers;
   }
 });
 
+//  Gestion des erreurs 401 et déclencher un logout global
+const baseQueryWithAuth = async (args, api, extraOptions) => {
+  const result = await rawBaseQuery(args, api, extraOptions);
+  if (result?.error?.status === 401) {
+    // Token expiré/invalide => purge + reset cache + redirection via garde de route
+    api.dispatch(logout());
+  }
+  return result;
+};
+
 export const baseApi = createApi({
   reducerPath: "api",
-  baseQuery: async (args, api, extra) => {
-    const res = await rawBaseQuery(args, api, extra);
-    if (res.error && res.error.status === 401) {
-      clearToken();
-    }
-    return res;
-  },
-  tagTypes: ["Profile"],
+  baseQuery: baseQueryWithAuth,
+  tagTypes: ["Profile", "Accounts", "Transactions", "Categories"],
   endpoints: () => ({})
 });

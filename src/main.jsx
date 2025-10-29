@@ -7,10 +7,10 @@ import {router} from "./router/index";
 import "./styles/main.css";
 
 // Activer les mocks MSW en dev (optionnel)
-if (import.meta.env.DEV) {
-  const {worker} = await import("./mocks/browser");
-  await worker.start({serviceWorker: {url: "/mockServiceWorker.js"}});
-}
+// if (import.meta.env.DEV) {
+//   const {worker} = await import("./mocks/browser");
+//   await worker.start({serviceWorker: {url: "/mockServiceWorker.js"}});
+// }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

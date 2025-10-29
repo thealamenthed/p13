@@ -6,5 +6,9 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: "./vitest.setup.js"
+  },
+  preview: {
+    port: 5000,
+    strictPort: true
   }
 });

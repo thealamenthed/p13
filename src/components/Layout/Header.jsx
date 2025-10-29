@@ -1,6 +1,6 @@
 import {Link, useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {loggedOut} from "../../features/auth/authSlice";
+import {logout} from "../../features/auth/authSlice";
 import {useGetProfileQuery} from "../../features/user/userApi";
 
 export default function Header() {
@@ -10,7 +10,7 @@ export default function Header() {
   const {data: profile} = useGetProfileQuery(undefined, {skip: !token});
 
   const onSignOut = () => {
-    dispatch(loggedOut());
+    dispatch(logout());
     navigate("/");
   };
 
@@ -26,7 +26,7 @@ export default function Header() {
             <>
               <Link className="main-nav-item" to="/profile">
                 <i className="fa fa-user-circle" aria-hidden="true"></i>
-                <span style={{marginLeft: 4}}>{profile?.firstName || "Profile"}</span>
+                <span style={{marginLeft: 4}}>{profile?.body.firstName || "Profile"}</span>
               </Link>
               <Link className="main-nav-item" to="/" onClick={onSignOut}>
                 <i className="fa fa-sign-out" aria-hidden="true"></i>

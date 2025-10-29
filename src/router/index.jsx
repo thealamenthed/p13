@@ -18,6 +18,9 @@ const withLayout = (el) => (
 export const router = createBrowserRouter([
   {path: "/", element: withLayout(<Home />)},
   {path: "/login", element: withLayout(<Login />)},
-  {element: withLayout(<ProtectedRoute />), children: [{path: "/profile", element: <Profile />}]},
+  {
+    element: withLayout(<ProtectedRoute />),
+    children: [{path: "/profile", element: <Profile />}]
+  },
   {path: "*", element: withLayout(<NotFound />)}
 ]);

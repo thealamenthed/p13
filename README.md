@@ -4,7 +4,7 @@
 # Argent Bank – Frontend (P13, JavaScript)
 
 Application React (JavaScript) pour l’authentification et la gestion du profil utilisateur d’Argent Bank.
-Phase 1 implémentée (Login, Profil). Phase 2 fournie sous forme de **proposition d’API Transactions** (OpenAPI YAML).
+Phase 1 implémentée (Login, Profil). Phase 2 fournie sous forme de **proposition d’API Transactions** (Swagger YAML).
 
 ## 🚀 Stack
 
@@ -45,7 +45,6 @@ npm run dev
 - `npm run dev` – lancer l’appli en mode dev
 - `npm run build` – build de production
 - `npm run preview` – servir le build localement
-- `npm run test` – exécuter les tests (Vitest)
 
 ## 🗂️ Structure
 
@@ -73,11 +72,6 @@ src/
 - Le **token** est stocké en `localStorage` (clé `argbank_token`).
 - `baseApi` ajoute `Authorization: Bearer <token>` si présent.
 - 401 → purge du token ; la route protégée redirige vers `/login`.
-
-## 🧪 Tests
-
-- `vitest`, `@testing-library/react`
-- Exemple : test du `authSlice` et tests des pages `Login`/`Profile`.
 
 ## ♿ Accessibilité
 
@@ -114,7 +108,7 @@ src/
 
 ## 🧪 Swagger – Phase 2 (Transactions)
 
-- La proposition `transactions.openapi.yaml` définit :
+- La proposition `/doc/swagger.yaml` définit :
   - `GET /accounts`, `GET/POST /transactions`, `GET/PATCH/DELETE /transactions/{id}`
   - Filtres (mois courant, accountId, pagination), sécurité **Bearer**
 
@@ -130,7 +124,6 @@ src/
 - **CORS/HTTPS** : utilisez la bonne URL dans `VITE_API_URL`.
 - **Slash final** : évitez le `/` final (`/api/v1` ✅).
 - **401** : vérifiez l’envoi du Bearer et le stockage `localStorage`.
-- **.env poussé par erreur** : régénérez les secrets et nettoyez l’historique (ex. BFG Repo-Cleaner), puis force-push.
 
 ## 📜 Licence
 
