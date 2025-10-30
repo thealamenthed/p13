@@ -9,12 +9,9 @@ info:
   termsOfService: "http://swagger.io/terms/"
 host: localhost:3001
 basePath: /api/v1
-schemes:
-  - http
-consumes:
-  - application/json
-produces:
-  - application/json
+schemes: [http]
+consumes: [application/json]
+produces: [application/json]
 
 securityDefinitions:
   Bearer:
@@ -43,15 +40,16 @@ paths:
           name: body
           description: Login Payload
           required: true
-          schema:
-            $ref: "#/definitions/Login"
+          schema: {$ref: "#/definitions/Login"}
       responses:
         "200":
           description: Login Successfully
-          schema:
-            $ref: "#/definitions/LoginResponse"
+          schema: {$ref: "#/definitions/LoginResponse"}
         "400":
-          description: Invalid Fields
+          description: Bad Request
+          schema: {$ref: "#/definitions/ErrorResponse"}
+          examples:
+            application/json: {status: 400, message: "Bad Request: invalid payload"}
         "500":
           description: Internal Server Error
 
@@ -65,22 +63,22 @@ paths:
           name: body
           description: Signup Payload
           required: true
-          schema:
-            $ref: "#/definitions/User"
+          schema: {$ref: "#/definitions/User"}
       responses:
         "200":
           description: Signup Successfully
-          schema:
-            $ref: "#/definitions/ApiResponse"
+          schema: {$ref: "#/definitions/ApiResponse"}
         "400":
-          description: Invalid Fields
+          description: Bad Request
+          schema: {$ref: "#/definitions/ErrorResponse"}
+          examples:
+            application/json: {status: 400, message: "Bad Request: invalid payload"}
         "500":
           description: Internal Server Error
 
   /user/profile:
     post:
-      security:
-        - Bearer: []
+      security: [{Bearer: []}]
       tags: [User Module]
       summary: User Profile API
       description: API for fetching a user profile
@@ -93,15 +91,21 @@ paths:
       responses:
         "200":
           description: User profile retrieved successully
-          schema:
-            $ref: "#/definitions/ApiResponse"
+          schema: {$ref: "#/definitions/ApiResponse"}
+        "401":
+          description: Unauthorized
+          schema: {$ref: "#/definitions/UnauthorizedResponse"}
+          examples:
+            application/json: {status: 401, message: "Unauthorized"}
         "400":
-          description: Invalid Fields
+          description: Bad Request
+          schema: {$ref: "#/definitions/ErrorResponse"}
+          examples:
+            application/json: {status: 400, message: "Bad Request"}
         "500":
           description: Internal Server Error
     put:
-      security:
-        - Bearer: []
+      security: [{Bearer: []}]
       tags: [User Module]
       summary: User Profile API
       description: API for updating a user profile
@@ -115,15 +119,21 @@ paths:
           name: body
           description: Update user profile attributes
           required: true
-          schema:
-            $ref: "#/definitions/UserProfile"
+          schema: {$ref: "#/definitions/UserProfile"}
       responses:
         "200":
           description: User profile updated successully
-          schema:
-            $ref: "#/definitions/ApiResponse"
+          schema: {$ref: "#/definitions/ApiResponse"}
+        "401":
+          description: Unauthorized
+          schema: {$ref: "#/definitions/UnauthorizedResponse"}
+          examples:
+            application/json: {status: 401, message: "Unauthorized"}
         "400":
-          description: Invalid Fields
+          description: Bad Request
+          schema: {$ref: "#/definitions/ErrorResponse"}
+          examples:
+            application/json: {status: 400, message: "Bad Request: invalid payload"}
         "500":
           description: Internal Server Error
 
@@ -131,25 +141,23 @@ paths:
 
   /accounts:
     get:
-      security:
-        - Bearer: []
+      security: [{Bearer: []}]
       tags: [Accounts]
       summary: Lister les comptes de l'utilisateur
       description: Retourne la liste des comptes de l'utilisateur courant.
       responses:
         "200":
           description: OK
-          schema:
-            $ref: "#/definitions/AccountsResponse"
+          schema: {$ref: "#/definitions/AccountsResponse"}
         "401":
           description: Unauthorized
-          schema:
-            $ref: "#/definitions/UnauthorizedResponse"
+          schema: {$ref: "#/definitions/UnauthorizedResponse"}
+          examples:
+            application/json: {status: 401, message: "Unauthorized"}
 
   /accounts/{accountId}/transactions:
     get:
-      security:
-        - Bearer: []
+      security: [{Bearer: []}]
       tags: [Transactions]
       summary: Lister les transactions d'un compte (par mois)
       description: >
@@ -181,13 +189,13 @@ paths:
           minimum: 1
           maximum: 100
           default: 31
-        - name: sort
+        - name: sortDate
           in: query
           required: false
           type: string
           description: Tri par date (desc par défaut)
-          enum: ["date", "-date"]
-          default: "-date"
+          enum: ["desc", "asc"]
+          default: "desc"
         - name: type
           in: query
           required: false
@@ -198,37 +206,43 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: "#/definitions/TransactionsPageResponse"
+          schema: {$ref: "#/definitions/TransactionsPageResponse"}
           examples:
             application/json:
               status: 200
               message: OK
               body:
                 data:
-                  - id: tx_1001
-                    date: "2025-10-01T09:12:00Z"
-                    description: Coffee Shop
+                  - id: tx_1002
+                    date: "2025-10-31T09:12:00Z"
+                    description: Golden Sun Bakery
                     amount: 4.5
                     currency: USD
                     balance: 2079.68
+                  - id: tx_1001
+                    date: "2025-10-30T10:32:00Z"
+                    description: Golden Sun Bakery
+                    amount: 3.5
+                    currency: USD
+                    balance: 2083.18
                 page: 1
                 pageSize: 31
                 totalItems: 42
                 totalPages: 2
         "401":
           description: Unauthorized
-          schema:
-            $ref: "#/definitions/UnauthorizedResponse"
+          schema: {$ref: "#/definitions/UnauthorizedResponse"}
+          examples:
+            application/json: {status: 401, message: "Unauthorized"}
         "404":
           description: Not Found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          schema: {$ref: "#/definitions/ErrorResponse"}
+          examples:
+            application/json: {status: 404, message: "Not Found"}
 
   /transactions/{transactionId}:
     get:
-      security:
-        - Bearer: []
+      security: [{Bearer: []}]
       tags: [Transactions]
       summary: Détail d'une transaction
       parameters:
@@ -240,8 +254,7 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: "#/definitions/TransactionResponse"
+          schema: {$ref: "#/definitions/TransactionResponse"}
           examples:
             application/json:
               status: 200
@@ -258,20 +271,22 @@ paths:
                 note: "Latte"
         "401":
           description: Unauthorized
-          schema:
-            $ref: "#/definitions/UnauthorizedResponse"
+          schema: {$ref: "#/definitions/UnauthorizedResponse"}
+          examples:
+            application/json: {status: 401, message: "Unauthorized"}
         "404":
           description: Not Found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          schema: {$ref: "#/definitions/ErrorResponse"}
+          examples:
+            application/json: {status: 404, message: "Not Found"}
     patch:
-      security:
-        - Bearer: []
+      security: [{Bearer: []}]
       tags: [Transactions]
-      summary: Mettre à jour les informations d'une transaction
+      summary: Mettre à jour la catégorie et/ou la note d'une transaction
       description: >
-        Édite uniquement les métadonnées utilisateur : `category`, `note`.
-        Les champs financiers (amount, currency, balance), la `date` et `transactionType` ne sont pas éditables.
+        Édite **uniquement** les métadonnées utilisateur : `category`, `note`.
+        Pour **supprimer** une valeur, envoyez `null` (ex: `"note": null"`).
+        Les champs financiers (`amount`, `currency`, `balance`), la `date` et `transactionType` ne sont pas éditables.
       parameters:
         - name: transactionId
           in: path
@@ -281,285 +296,183 @@ paths:
         - in: body
           name: body
           required: true
-          schema:
-            $ref: "#/definitions/TransactionUpdate"
+          schema: {$ref: "#/definitions/TransactionUpdate"}
+          x-examples:
+            application/json: {note: null}
       responses:
         "200":
           description: OK
-          schema:
-            $ref: "#/definitions/TransactionResponse"
+          schema: {$ref: "#/definitions/TransactionResponse"}
+          examples:
+            application/json:
+              status: 200
+              message: OK
+              body:
+                id: tx_1001
+                date: "2025-10-01T09:12:00Z"
+                description: Coffee Shop
+                amount: 4.5
+                currency: USD
+                balance: 2079.68
+                transactionType: electronic
+                category: food
+                note: null
         "400":
-          description: Invalid Fields
+          description: Bad Request
+          schema: {$ref: "#/definitions/ErrorResponse"}
+          examples:
+            application/json: {status: 400, message: "Bad Request: invalid payload"}
         "401":
           description: Unauthorized
-          schema:
-            $ref: "#/definitions/UnauthorizedResponse"
+          schema: {$ref: "#/definitions/UnauthorizedResponse"}
+          examples:
+            application/json: {status: 401, message: "Unauthorized"}
         "404":
           description: Not Found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
-
-  /transactions/{transactionId}/metadata:
-    delete:
-      security:
-        - Bearer: []
-      tags: [Transactions]
-      summary: Réinitialiser les informations utilisateur d'une transaction
-      description: Supprime `category` et `note` (retour à l'état initial). Idempotent.
-      parameters:
-        - name: transactionId
-          in: path
-          required: true
-          type: string
-          description: Identifiant de la transaction
-      responses:
-        "204":
-          description: No Content
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: "#/definitions/UnauthorizedResponse"
-        "404":
-          description: Not Found
-          schema:
-            $ref: "#/definitions/ErrorResponse"
+          schema: {$ref: "#/definitions/ErrorResponse"}
+          examples:
+            application/json: {status: 404, message: "Not Found"}
 
   /categories:
     get:
-      security:
-        - Bearer: []
+      security: [{Bearer: []}]
       tags: [Categories]
-      summary: Lister les catégories suggérées (optionnel)
+      summary: Lister les catégories suggérées
       responses:
         "200":
           description: OK
-          schema:
-            $ref: "#/definitions/CategoriesResponse"
+          schema: {$ref: "#/definitions/CategoriesResponse"}
         "401":
           description: Unauthorized
-          schema:
-            $ref: "#/definitions/UnauthorizedResponse"
+          schema: {$ref: "#/definitions/UnauthorizedResponse"}
+          examples:
+            application/json: {status: 401, message: "Unauthorized"}
 
 definitions:
   # ---------- Phase 1 ----------
   User:
     type: object
     properties:
-      email:
-        type: string
-        description: user email
-      password:
-        type: string
-        description: user password
-      firstName:
-        type: string
-        description: user first name
-      lastName:
-        type: string
-        description: user last name
+      email: {type: string, description: user email}
+      password: {type: string, description: user password}
+      firstName: {type: string, description: user first name}
+      lastName: {type: string, description: user last name}
 
   Login:
     type: object
     properties:
-      email:
-        type: string
-        description: user email
-      password:
-        type: string
-        description: user password
+      email: {type: string, description: user email}
+      password: {type: string, description: user password}
 
   ApiResponse:
     type: object
     properties:
-      status:
-        type: integer
-      message:
-        type: string
+      status: {type: integer}
+      message: {type: string}
       body:
         type: object
         properties:
-          id:
-            type: string
-          email:
-            type: string
-          firstName:
-            type: string
-          lastName:
-            type: string
+          id: {type: string}
+          email: {type: string}
+          firstName: {type: string}
+          lastName: {type: string}
 
   LoginResponse:
     type: object
     properties:
-      token:
-        type: string
+      token: {type: string}
 
   UserProfile:
     type: object
     properties:
-      firstName:
-        type: string
-      lastName:
-        type: string
+      firstName: {type: string}
+      lastName: {type: string}
 
   # ---------- Phase 2 (proposition) ----------
   ErrorResponse:
     type: object
     properties:
-      status:
-        type: integer
-        example: 404
-      message:
-        type: string
-        example: Not Found
+      status: {type: integer, example: 404}
+      message: {type: string, example: Not Found}
 
   UnauthorizedResponse:
     type: object
     properties:
-      status:
-        type: integer
-        example: 401
-      message:
-        type: string
-        example: Unauthorized
+      status: {type: integer, example: 401}
+      message: {type: string, example: Unauthorized}
 
   AccountsResponse:
     type: object
     properties:
-      status:
-        type: integer
-        example: 200
-      message:
-        type: string
-        example: OK
+      status: {type: integer, example: 200}
+      message: {type: string, example: OK}
       body:
         type: array
-        items:
-          $ref: "#/definitions/Account"
+        items: {$ref: "#/definitions/Account"}
 
   CategoriesResponse:
     type: object
     properties:
-      status:
-        type: integer
-        example: 200
-      message:
-        type: string
-        example: OK
+      status: {type: integer, example: 200}
+      message: {type: string, example: OK}
       body:
         type: array
-        items:
-          type: string
-        example:
-          - Food
-          - Groceries
-          - Transport
-          - Shopping
-          - Bills
-          - Travel
-          - Entertainment
+        items: {type: string}
+        example: [Food, Groceries, Transport, Shopping, Bills, Travel, Entertainment]
 
   TransactionResponse:
     type: object
     properties:
-      status:
-        type: integer
-        example: 200
-      message:
-        type: string
-        example: OK
-      body:
-        $ref: "#/definitions/Transaction"
+      status: {type: integer, example: 200}
+      message: {type: string, example: OK}
+      body: {$ref: "#/definitions/Transaction"}
 
   TransactionsPageResponse:
     type: object
     properties:
-      status:
-        type: integer
-        example: 200
-      message:
-        type: string
-        example: OK
-      body:
-        $ref: "#/definitions/TransactionsPage"
+      status: {type: integer, example: 200}
+      message: {type: string, example: OK}
+      body: {$ref: "#/definitions/TransactionsPage"}
 
   Account:
     type: object
-    required: [id, name, type, mask, balance, currency]
+    required: [id, name, type, lastDigits, balance, currency]
     properties:
-      id:
-        type: string
-        example: acc_1
-      name:
-        type: string
-        example: Argent Bank Checking (x8349)
+      id: {type: string, example: acc_1}
+      name: {type: string, example: "Argent Bank Checking (x8349)"}
       type:
         type: string
         enum: [CHECKING, SAVINGS, CREDIT_CARD]
-      mask:
+      lastDigits:
         type: string
-        description: Quatre derniers chiffres
+        description: Quatre derniers chiffres affichables
         example: "8349"
-      balance:
-        type: number
-        format: float
-        example: 2082.79
-      currency:
-        type: string
-        example: USD
+      balance: {type: number, format: float, example: 2082.79}
+      currency: {type: string, example: USD}
 
   # Résumé pour la LISTE
   TransactionSummary:
     type: object
     required: [id, date, description, amount, currency, balance]
     properties:
-      id:
-        type: string
-        example: tx_1001
-      date:
-        type: string
-        format: date-time
-        example: "2025-10-01T09:12:00Z"
-      description:
-        type: string
-        example: Coffee Shop
-      amount:
-        type: number
-        format: float
-        example: 4.5
-      currency:
-        type: string
-        example: USD
-      balance:
-        type: number
-        format: float
-        example: 2079.68
+      id: {type: string, example: tx_1001}
+      date: {type: string, format: date-time, example: "2025-10-01T09:12:00Z"}
+      description: {type: string, example: Coffee Shop}
+      amount: {type: number, format: float, example: 4.5}
+      currency: {type: string, example: USD}
+      balance: {type: number, format: float, example: 2079.68}
 
   # Détail complet
   Transaction:
     type: object
     required: [id, date, description, amount, currency, balance, transactionType]
     properties:
-      id:
-        type: string
-        example: tx_1001
-      date:
-        type: string
-        format: date-time
-        example: "2025-10-01T09:12:00Z"
-      description:
-        type: string
-        example: Coffee Shop
-      amount:
-        type: number
-        format: float
-        example: 4.5
-      currency:
-        type: string
-        example: USD
-      balance:
-        type: number
-        format: float
-        example: 2079.68
+      id: {type: string, example: tx_1001}
+      date: {type: string, format: date-time, example: "2025-10-01T09:12:00Z"}
+      description: {type: string, example: Coffee Shop}
+      amount: {type: number, format: float, example: 4.5}
+      currency: {type: string, example: USD}
+      balance: {type: number, format: float, example: 2079.68}
       transactionType:
         type: string
         description: Type de transaction
@@ -577,7 +490,9 @@ definitions:
 
   TransactionUpdate:
     type: object
-    description: Champs éditables côté utilisateur pour une transaction
+    description: >
+      Champs éditables côté utilisateur.  
+      Pour **supprimer** une valeur, envoyez `null` (ex: `"note": null`).
     additionalProperties: false
     properties:
       category:
@@ -585,11 +500,13 @@ definitions:
         x-nullable: true
         maxLength: 80
         example: food
+        description: Catégorie libre. Envoyer `null` pour supprimer.
       note:
         type: string
         x-nullable: true
         maxLength: 500
         example: "client meeting at noon"
+        description: Note libre. Envoyer `null` pour supprimer.
     minProperties: 1
 
   TransactionsPage:
@@ -598,17 +515,8 @@ definitions:
     properties:
       data:
         type: array
-        items:
-          $ref: "#/definitions/TransactionSummary"
-      page:
-        type: integer
-        example: 1
-      pageSize:
-        type: integer
-        example: 31
-      totalItems:
-        type: integer
-        example: 42
-      totalPages:
-        type: integer
-        example: 2
+        items: {$ref: "#/definitions/TransactionSummary"}
+      page: {type: integer, example: 1}
+      pageSize: {type: integer, example: 31}
+      totalItems: {type: integer, example: 42}
+      totalPages: {type: integer, example: 2}
