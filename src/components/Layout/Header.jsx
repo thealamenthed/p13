@@ -1,7 +1,8 @@
 import {Link, useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {logout} from "../../features/auth/authSlice";
+import {loggedOut} from "../../features/auth/authSlice";
 import {useGetProfileQuery} from "../../features/user/userApi";
+import {clearToken} from "../../services/token";
 
 export default function Header() {
   const token = useAppSelector((s) => s.auth.token);
@@ -10,7 +11,8 @@ export default function Header() {
   const {data: profile} = useGetProfileQuery(undefined, {skip: !token});
 
   const onSignOut = () => {
-    dispatch(logout());
+    clearToken();
+    dispatch(loggedOut());
     navigate("/");
   };
 

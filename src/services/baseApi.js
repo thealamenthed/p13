@@ -1,6 +1,7 @@
 // src/services/baseApi.js
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
-import {logout} from "../features/auth/authSlice";
+import {loggedOut} from "../features/auth/authSlice";
+import {clearToken} from "./token";
 
 // BaseQuery avec injection automatique du JWT depuis Redux sur toutes les requêtes
 const rawBaseQuery = fetchBaseQuery({
@@ -16,8 +17,9 @@ const rawBaseQuery = fetchBaseQuery({
 const baseQueryWithAuth = async (args, api, extraOptions) => {
   const result = await rawBaseQuery(args, api, extraOptions);
   if (result?.error?.status === 401) {
-    // Token expiré/invalide => purge + reset cache + redirection via garde de route
-    api.dispatch(logout());
+    // Token expiré/invalide => purge le token et reset le cache + redirection via garde de route
+    clearToken();
+    api.dispatch(loggedOut());
   }
   return result;
 };
@@ -25,6 +27,6 @@ const baseQueryWithAuth = async (args, api, extraOptions) => {
 export const baseApi = createApi({
   reducerPath: "api",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["Profile", "Accounts", "Transactions", "Categories"],
+  tagTypes: ["Profile"],
   endpoints: () => ({})
 });

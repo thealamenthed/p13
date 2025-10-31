@@ -2,9 +2,13 @@
 import {useState} from "react";
 import {useNavigate, Link} from "react-router-dom";
 import {useLoginMutation} from "../features/user/userApi";
+import {loggedIn} from "../features/auth/authSlice";
+import {useDispatch} from "react-redux";
+import {setToken} from "../services/token";
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [form, setForm] = useState({
     email: "",
@@ -26,6 +30,8 @@ export default function Login() {
       // renvoyer { token } ou { status, message, body: { token } }
       const token = res?.body?.token || res?.token;
       if (!token) throw new Error("Token manquant dans la réponse");
+      setToken(token);
+      dispatch(loggedIn(token));
       navigate("/profile");
     } catch (err) {
       console.error(err);
