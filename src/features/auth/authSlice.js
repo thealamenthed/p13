@@ -1,7 +1,6 @@
 // src/features/auth/authSlice.js
 import {createSlice} from "@reduxjs/toolkit";
-import {getToken, setToken, clearToken} from "../../services/token";
-import {baseApi} from "../../services/baseApi";
+import {getToken} from "../../services/token";
 
 // L'état initial lit un token éventuel déjà persisté
 const initialState = {token: getToken() || null};
@@ -11,26 +10,14 @@ const slice = createSlice({
   initialState,
   reducers: {
     loggedIn(state, {payload}) {
-      state.token = payload; // reducer pur
+      state.token = payload;
     },
     loggedOut(state) {
-      state.token = null; // reducer pur
+      state.token = null;
     }
   }
 });
 
 export const {loggedIn, loggedOut} = slice.actions;
-
-// --- Thunks (actions asynchrones / avec effets) ---
-export const login = (token) => (dispatch) => {
-  setToken(token); // effet (persistance)
-  dispatch(loggedIn(token)); // MAJ state
-};
-
-export const logout = () => (dispatch) => {
-  clearToken(); // efface persistance
-  dispatch(loggedOut()); // MAJ state
-  dispatch(baseApi.util.resetApiState()); // vider le cache RTK Query
-};
 
 export default slice.reducer;

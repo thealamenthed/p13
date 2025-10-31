@@ -1,12 +1,9 @@
 // src/pages/Login.jsx
 import {useState} from "react";
-import {useDispatch} from "react-redux";
 import {useNavigate, Link} from "react-router-dom";
-import {login as loginThunk} from "../features/auth/authSlice";
 import {useLoginMutation} from "../features/user/userApi";
 
 export default function Login() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -26,10 +23,9 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await login({email: form.email, password: form.password}).unwrap();
-      // Le back Phase 1 peut renvoyer { token } ou { status, message, body: { token } }
+      // renvoyer { token } ou { status, message, body: { token } }
       const token = res?.body?.token || res?.token;
       if (!token) throw new Error("Token manquant dans la réponse");
-      dispatch(loginThunk(token)); //thunk qui persiste + met à jour Redux
       navigate("/profile");
     } catch (err) {
       console.error(err);

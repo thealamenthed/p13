@@ -3,7 +3,7 @@ import {baseApi} from "../../services/baseApi";
 export const userApi = baseApi.injectEndpoints({
   endpoints: (b) => ({
     login: b.mutation({
-      query: (body) => ({url: "/user/login", method: "POST", body}) //renvoie token (via transformResponse)
+      query: (body) => ({url: "/user/login", method: "POST", body}) // on envoie le body (email et password)
     }),
     getProfile: b.query({
       query: () => ({url: "/user/profile", method: "POST"}), //renvoie body (profil)
