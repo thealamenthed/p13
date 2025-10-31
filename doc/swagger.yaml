@@ -139,7 +139,7 @@ paths:
 
   # ---------- Phase 2 : Accounts & Transactions (Proposition) ----------
 
-  /accounts:
+  /accounts/{accountId}:
     get:
       security: [{Bearer: []}]
       tags: [Accounts]
